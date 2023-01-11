@@ -16,8 +16,15 @@ pub struct Block {
 
 impl Block{
 
-    pub fn new(index: u64, nonce: String, ) -> Block {
-
+    pub fn new(index: u64, previous_hash: String, ) -> Self {
+        let block= Block{
+            index, 
+            timestamp: Utc::now().timestamp_millis() as u64, 
+            proof_of_work: u64::default(), 
+            previous_hash, 
+            hash: String::default(), 
+        }; 
+        block
     }
         
     // calculate hash 
@@ -28,7 +35,21 @@ impl Block{
         let mut hasher= Sha256::new(); 
         hasher.update(serialized_block_data);
         let result= hasher.finalize(); 
-        format!("{:x}", result);
+        format!("{:x}", result)
+        
+    }
+
+    //mine block hash 
+    pub fn mine(&mut self, blockchain: Blockchain){
+        loop {
+            if !self.hash.starts_with(&"0".repeat(blockchain.difficulty)){
+                self.proof_of_work+=1; 
+                self.hash= self.calculate_hash(); 
+            }
+            else {
+                break
+            }
+        }
     }
 
 
